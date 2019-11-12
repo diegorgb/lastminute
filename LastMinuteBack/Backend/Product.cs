@@ -10,6 +10,7 @@ namespace Backend
     {
         public string Name { get; set; }
         public double Price { get; set; }
+        public double FinalPrice { get { return Math.Round(Price + CalculateTaxes(), 2, MidpointRounding.ToEven); } }
 
         public bool TaxFree { get; protected set; }
         public bool Imported { get; protected set; }
@@ -30,7 +31,17 @@ namespace Backend
                 totalTax += Price * ImportTax / 100;
             }
 
-            return Math.Round(totalTax, 2, MidpointRounding.AwayFromZero);
+            return RoundToNext5cent(totalTax);
+        }
+
+        private double RoundToNext5cent(double d)
+        {
+            var ceiling = Math.Ceiling(d * 20);
+            if (ceiling == 0)
+            {
+                return 0;
+            }
+            return Math.Round(ceiling / 20, 2, MidpointRounding.ToEven);
         }
 
         public static Product TryParse(string prodLiteral)
